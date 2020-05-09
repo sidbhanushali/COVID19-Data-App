@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import {getData} from './coronaAPI'
+import {Cards, Chart, CountryPicker} from './components'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Styles from './App.module.css'
+
+import logo from '../src/image-2.png'
+
+class App extends Component {
+state = {
+appData: {},
+country: ''
 }
 
-export default App;
+
+
+async componentDidMount(){
+    const covidInfo = await getData(); 
+    this.setState({appData: covidInfo})
+
+}
+
+
+handleCountryChange = async(country) =>{
+     //fetch data
+const countryData = await getData(country);
+    console.log(country);
+    console.log(countryData);
+    
+    //set the state 
+    this.setState({appData: countryData, country: country})
+} 
+
+
+    render() {
+        
+        return (
+            <div className={Styles.container}>
+
+                <img className={Styles.image} alt='CORONAVIRUS' src={logo}/>
+                <Cards data={this.state.appData}/> 
+                <CountryPicker handleCountryChange={this.handleCountryChange}/>
+                <Chart country={this.state.country} data={this.state.appData}/>
+                    <span> 
+                       
+                        <a style={{color:'white' , fontWeight: "bold"}} href='https://www.github.com/sidbhanushali'>  <p> &#169; Siddharth Bhanushali || Github </p>  </a>
+                    </span>
+            </div>
+        )
+    }
+}
+export default App
