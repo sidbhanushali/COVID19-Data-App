@@ -16,7 +16,7 @@ country: ''
 
 async componentDidMount(){
     const covidInfo = await getData(); 
-    this.setState({appData: covidInfo})
+    this.setState({appData})
 
 }
 
