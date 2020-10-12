@@ -1,31 +1,36 @@
-import React, {useState, useEffect} from 'react'
-import {NativeSelect, FormControl, Paper} from '@material-ui/core'
+import React, { useState, useEffect } from "react";
+import { NativeSelect, FormControl } from "@material-ui/core";
 
-import {getCountryList} from '../../coronaAPI'
+import { fetchCountries } from "../../api";
 
-import CountryPickerStyles from './CountryPicker.module.css'
+import styles from "./CountryPicker.module.css";
 
- const CountryPicker=({handleCountryChange}) => {
-    const [Countries, setCountries] = useState([]); 
+const Countries = ({ handleCountryChange }) => {
+  const [countries, setCountries] = useState([]);
 
-    useEffect(()=>{
-            const asyncUseEffect = async()=> {
-            setCountries(await getCountryList() )
-            }
-        asyncUseEffect();
-    },[setCountries]);
+  useEffect(() => {
+    const fetchAPI = async () => {
+      setCountries(await fetchCountries());
+    };
 
+    fetchAPI();
+  }, []);
 
-    console.log(Countries)
+  return (
+    <FormControl className={styles.formControl}>
+      <NativeSelect
+        defaultValue=''
+        onChange={(e) => handleCountryChange(e.target.value)}
+      >
+        <option value=''>Global</option>
+        {countries.map((country, i) => (
+          <option key={i} value={country}>
+            {country}
+          </option>
+        ))}
+      </NativeSelect>
+    </FormControl>
+  );
+};
 
-    return (
-    <Paper className={CountryPickerStyles.component} variant='outlined' elevation={4} children={FormControl}>
-           <NativeSelect defaultValue="global" onChange={(e)=>{handleCountryChange(e.target.value)}}>
-           <option value=''> Global  </option>
-            {Countries.map((country, i)=>(<option key={i} value={country}> {country} </option>))}
-           </NativeSelect>  
-    </Paper>
-    )
-}
-
-export default CountryPicker
+export default Countries;

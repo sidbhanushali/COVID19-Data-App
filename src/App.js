@@ -1,52 +1,41 @@
-import React, { Component } from 'react'
-import {getData} from './coronaAPI'
-import {Cards, Chart, CountryPicker} from './components'
+import React from "react";
 
-import Styles from './App.module.css'
+import { Cards, CountryPicker, Chart } from "./components";
+import { fetchData } from "./api/";
+import styles from "./App.module.css";
 
-import logo from '../src/image-2.png'
+import image from "./images/image.png";
 
-class App extends Component {
-state = {
-appData: {},
-country: ''
+class App extends React.Component {
+  state = {
+    data: {},
+    country: "",
+  };
+
+  async componentDidMount() {
+    const data = await fetchData();
+
+    this.setState({ data });
+  }
+
+  handleCountryChange = async (country) => {
+    const data = await fetchData(country);
+
+    this.setState({ data, country: country });
+  };
+
+  render() {
+    const { data, country } = this.state;
+
+    return (
+      <div className={styles.container}>
+        <img className={styles.image} src={image} alt='COVID-19' />
+        <Cards data={data} country={country} />
+        <CountryPicker handleCountryChange={this.handleCountryChange} />
+        <Chart data={data} country={country} />
+      </div>
+    );
+  }
 }
 
-
-
-async componentDidMount(){
-    const covidInfo = await getData(); 
-    this.setState({appData})
-
-}
-
-
-handleCountryChange = async(country) =>{
-     //fetch data
-const countryData = await getData(country);
-    console.log(country);
-    console.log(countryData);
-    
-    //set the state 
-    this.setState({appData: countryData, country: country})
-} 
-
-
-    render() {
-        
-        return (
-            <div className={Styles.container}>
-
-                <img className={Styles.image} alt='CORONAVIRUS' src={logo}/>
-                <Cards data={this.state.appData}/> 
-                <CountryPicker handleCountryChange={this.handleCountryChange}/>
-                <Chart country={this.state.country} data={this.state.appData}/>
-                    <span> 
-                       
-                        <a style={{color:'white' , fontWeight: "bold"}} href='https://www.github.com/sidbhanushali'>  <p> &#169; Siddharth Bhanushali || Github </p>  </a>
-                    </span>
-            </div>
-        )
-    }
-}
-export default App
+export default App;

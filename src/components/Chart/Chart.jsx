@@ -1,91 +1,78 @@
-import React, {useState, useEffect} from 'react'
-import {getDailyData} from '../../coronaAPI'
-import {Line, Bar} from 'react-chartjs-2'
-import {Paper} from '@material-ui/core'
+import React, { useState, useEffect } from 'react';
+import { Line, Bar } from 'react-chartjs-2';
 
-import ChartStyles from './Chart.module.css'
+import { fetchDailyData } from '../../api';
 
-// destructure the data object within the props destructure to get the values
- const Chart = ({data: {confirmed, deaths, recovered}, country}) => {
-// HOOKS
-        const [dailyData, setDailyData] = useState([]); 
+import styles from './Chart.module.css';
 
-        useEffect(()=>{
-               
-                const asyncUseEffect = async () => {
-                    setDailyData(await getDailyData() );
-                }
+const Chart = ({ data: { confirmed, recovered, deaths }, country }) => {
+  const [dailyData, setDailyData] = useState({});
 
-            asyncUseEffect(); 
-            
-        }, []);
+  useEffect(() => {
+    const fetchMyAPI = async () => {
+      const initialDailyData = await fetchDailyData();
 
+      setDailyData(initialDailyData);
+    };
 
+    fetchMyAPI();
+  }, []);
 
+  const barChart = (
+    confirmed ? (
+      <Bar
+        data={{
+          labels: ['Infected', 'Recovered', 'Deaths'],
+          datasets: [
+            {
+              label: 'People',
+              backgroundColor: ['rgba(0, 0, 255, 0.5)', 'rgba(0, 255, 0, 0.5)', 'rgba(255, 0, 0, 0.5)'],
+              data: [confirmed.value, recovered.value, deaths.value],
+            },
+          ],
+        }}
+        options={{
+          legend: { display: false },
+          title: { display: true, text: `Current state in ${country}` },
+        }}
+      />
+    ) : null
+  );
 
-  // LINE CHART COMPONENT WITH DATA - REACT CHARTS JS  
-        const lineChart = (
-            // makes sure not to load the line chart without getting the data.map
-                    dailyData.length?
-                            <Line
-                            data={{
-                                labels: dailyData.map(({date})=>date),
-                                datasets: [ 
-                                    {data:  dailyData.map(({confirmed})=>confirmed),
-                                    label: 'Confirmed',
-                                    borderColor:'rgba(118, 0, 187, 0.6)',
-                                    fill: true 
-                                    },
-                                    
-                                    {
-                                        data:  dailyData.map(({deaths})=>deaths),
-                                        label: 'Deaths',
-                                        borderColor:'red',
-                                        backgroundColor: 'rgba(254, 0 , 0, 0.5)',
-                                        fill: true
-                                    }
-                                ]
-                            }} 
-                            />:null 
+  const lineChart = (
+    dailyData[0] ? (
+      <Line
+        data={{
+          labels: dailyData.map(({ date }) => new Date(date).toLocaleDateString()),
+          datasets: [{
+            data: dailyData.map((data) => data.confirmed),
+            label: 'Infected',
+            borderColor: '#3333ff',
+            fill: true,
+          }, {
+            data: dailyData.map((data) => data.deaths),
+            label: 'Deaths',
+            borderColor: 'red',
+            backgroundColor: 'rgba(255, 0, 0, 0.5)',
+            fill: true,
+          },  {
+            data: dailyData.map((data) => data.recovered),
+            label: 'Recovered',
+            borderColor: 'green',
+            backgroundColor: 'rgba(0, 255, 0, 0.5)',
+            fill: true,
+          },
+          ],
+        }}
+      />
+    ) : null
+  );
 
-        ); 
+  return (
+    <div className={styles.container}>
+      {country ? barChart : lineChart}
+    </div>
+  );
+};
 
-
- // BAR CHART COMPONENT WITH DATA REACT CHARTS JS 
-const barChart = (
-    confirmed?
-    <Bar
-    data={{
-        labels: ['Confirmed', 'Recovered', 'Deaths'],
-        datasets: [{label: 'People',
-         backgroundColor: [
-            'rgba(118, 0, 187, 0.6)',
-            'rgba(5, 124, 45, 0.6)',
-            'rgba(235, 0, 0, 0.6)'
-                 ],
-         data: [ confirmed.value, recovered.value, deaths.value]       
-                }]
-            }}
-    
-     options={{
-         legend: {display: false},
-         title:  {display: true, text: `Current Statistics form ${country}`}
-     }}
-     />
-    :null
-);
-
-
-
-
-//  RETURNED FUNCTION JSX 
-    return (
-        <div className={ChartStyles.container}>
-            <Paper className={ChartStyles.container} elevation={6}>
-                 {country?barChart:lineChart}
-                 </Paper>
-        </div>
-    )
-}
-
-export default Chart
+export default Chart;
