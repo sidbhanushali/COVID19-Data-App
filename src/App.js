@@ -33,6 +33,15 @@ class App extends React.Component {
         <Cards data={data} country={country} />
         <CountryPicker handleCountryChange={this.handleCountryChange} />
         <Chart data={data} country={country} />
+
+        <span>
+          <a
+            style={{ color: "black", fontWeight: "bold" }}
+            href='https://www.github.com/sidbhanushali'
+          >
+            <p> &copy; Siddharth Bhanushali </p>{" "}
+          </a>
+        </span>
       </div>
     );
   }

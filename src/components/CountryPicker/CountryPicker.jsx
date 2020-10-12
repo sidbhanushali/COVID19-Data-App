@@ -16,8 +16,8 @@ const Countries = ({ handleCountryChange }) => {
   }, []);
 
   return (
-    <Paper>
-      <FormControl className={styles.formControl}>
+    <FormControl className={styles.formControl}>
+      <Paper>
         <NativeSelect
           defaultValue=''
           onChange={(e) => handleCountryChange(e.target.value)}
@@ -29,8 +29,8 @@ const Countries = ({ handleCountryChange }) => {
             </option>
           ))}
         </NativeSelect>
-      </FormControl>
-    </Paper>
+      </Paper>
+    </FormControl>
   );
 };
 
